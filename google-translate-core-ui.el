@@ -412,25 +412,33 @@ message is printed."
                            (google-translate-json-suggestion json)))
              (translation-text-new-line (when (null google-translate-listen-program) t)))
 
-        (with-output-to-temp-buffer buffer-name
-          (set-buffer buffer-name)
-          (google-translate--buffer-output-translation-title source-language
-                                                             target-language
-                                                             auto-detected-language)
-          (google-translate--buffer-output-translating-text text translation-text-new-line)
-          (when google-translate-listen-program
-            (google-translate--buffer-output-listen-button text source-language))
-          (google-translate--buffer-output-text-phonetic text-phonetic)
-          (google-translate--buffer-output-translation translation)
-          (google-translate--buffer-output-translation-phonetic translation-phonetic)
-          (if detailed-translation
-              (google-translate--buffer-output-detailed-translation
-               detailed-translation
-               translation)
-            (when suggestion
-              (google-translate--buffer-output-suggestion suggestion
-                                                          source-language
-                                                          target-language))))))))
+        (set-buffer (get-buffer-create buffer-name))
+        (special-mode)
+        (setq buffer-read-only nil
+              buffer-undo-list t)
+        (erase-buffer)
+
+        (google-translate--buffer-output-translation-title source-language
+                                                           target-language
+                                                           auto-detected-language)
+        (google-translate--buffer-output-translating-text text translation-text-new-line)
+        (when google-translate-listen-program
+          (google-translate--buffer-output-listen-button text source-language))
+        (google-translate--buffer-output-text-phonetic text-phonetic)
+        (google-translate--buffer-output-translation translation)
+        (google-translate--buffer-output-translation-phonetic translation-phonetic)
+        (if detailed-translation
+            (google-translate--buffer-output-detailed-translation
+             detailed-translation
+             translation)
+          (when suggestion
+            (google-translate--buffer-output-suggestion suggestion
+                                                        source-language
+                                                        target-language)))
+
+        (set-buffer-modified-p nil)
+        (setq buffer-read-only t)
+        (display-buffer buffer-name)))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
