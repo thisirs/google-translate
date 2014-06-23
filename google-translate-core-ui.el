@@ -485,9 +485,11 @@ ido-style completion."
   (interactive)
   (let ((previous-buffer (get-next-valid-buffer (buffer-list) (current-buffer) t)))
     (when previous-buffer
-      (let ((translation google-translate-translation))
-        (with-current-buffer previous-buffer
-          (insert translation)))))
+      (let* ((translation google-translate-translation)
+             (point (with-current-buffer previous-buffer
+                      (insert translation)
+                      (point))))
+        (set-window-point (get-buffer-window previous-buffer) point))))
   (quit-window))
 
 (defun google-translate-kill-ring-save-source ()
